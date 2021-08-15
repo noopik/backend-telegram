@@ -24,13 +24,14 @@ const upload = multer({
 });
 
 // Error Handling Upload File
-const uploadFile = (req, res, next, field, maxCount) => {
-  const singleUpload = upload.single(field);
+const uploadFile = async(req, res, next, field, maxCount) => {
+  const singleUpload = await upload.single(field);
   const multipleUpload = upload.array(field, maxCount);
 
+  console.log(123, singleUpload.fileFilter);
+
   if (!maxCount) {
-    return singleUpload(req, res, next, (err) => {
-      console.log(err);
+    singleUpload(req, res, next, (err) => {
       if (err instanceof multer.MulterError) {
         console.log('instanceof', err);
       } else if (error) {
@@ -39,12 +40,14 @@ const uploadFile = (req, res, next, field, maxCount) => {
         message.status = 405;
         next(message);
       }
-      // console.log('req.file', req.file);
+      console.log('req.file', req.file);
       // limitationSize(req, next);
-      // next();
+      next();
     });
   } else {
-    return multipleUpload(req, res, (err) => {
+    console.log(2);
+
+    multipleUpload(req, res, (err) => {
       // console.log('req multipleUpload', req.files);
       if (err instanceof multer.MulterError) {
         console.log('instanceof', err);
@@ -56,19 +59,10 @@ const uploadFile = (req, res, next, field, maxCount) => {
       }
       // console.log('multipleUpload', req.files);
       limitationSize(req, next);
-      // next();
+      next();
     });
   }
 };
-
-// Multiple file upload
-// const uploadMultiple = multer({
-//   storage: storage,
-//   limits: { fileSize: 1000000 },
-//   fileFilter: function(req, file, cb) {
-//     checkFileType(file, cb);
-//   },
-// });
 
 const checkFileType = (file, cb) => {
   const fileTypes = /jpeg|jpg|png|gif/;
