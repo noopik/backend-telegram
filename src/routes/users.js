@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/usersController');
 const { verifyAccess } = require('../middleware/auth');
-const { uploadFile } = require('../middleware/multer');
+const { singleUpload } = require('../middleware/multer');
 
 router
   .get('/', verifyAccess, userController.getAllUsers)
@@ -12,12 +12,7 @@ router
   .post('/forgot-password', userController.getUserByEmail)
   .patch('/change-password/:id', verifyAccess, userController.updatePassword)
   .get('/:id', verifyAccess, userController.getUserId)
-  .patch(
-    '/:id',
-    verifyAccess,
-    (req, res, next) => uploadFile(req, res, next, 'avatar'),
-    userController.updateUser
-  )
+  .patch('/:id', verifyAccess, singleUpload, userController.updateUser)
 
 .delete('/:id', verifyAccess, userController.deleteUser);
 

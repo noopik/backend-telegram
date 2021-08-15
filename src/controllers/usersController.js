@@ -183,8 +183,6 @@ module.exports = {
       avatar,
     } = req.body;
 
-    console.log(req.body);
-
     // Hashing Password
     // const salt = bcrypt.genSaltSync(10);
     // const hash = bcrypt.hashSync(password, salt);
@@ -214,40 +212,27 @@ module.exports = {
     };
 
     // OLD Images
-    // const oldAvatar = await UserModel.getUserId(id)
-    //   .then((result) => {
-    //     const data = result[0].avatar;
-    //     return data;
-    //   })
-    //   .catch(next);
-    // console.log(oldAvatar);
+    const oldAvatar = await UserModel.getUserId(id)
+      .then((result) => {
+        const data = result[0].avatar;
+        return data;
+      })
+      .catch(next);
+    console.log(oldAvatar);
 
     UserModel.updateUser(id, newData)
-      .then((result) => {
-        console.log(result);
-        // try {
-        //   if (oldAvatar === 'user-default.png') {
-        //     return null;
-        //   }
-        //   const getAvatarName = oldAvatar.split('/')[4];
-
-        //   await fs.unlinkSync(`public/images/${getAvatarName}`);
-        //   console.log(`successfully deleted ${getAvatarName}`);
-        // } catch (err) {
-        //   console.error('there was an error:', err.message);
-        // }
+      .then(async() => {
+        // console.log(result);
+        try {
+          await fs.unlinkSync(`public/images/${oldAvatar}`);
+          console.log(`successfully deleted ${oldAvatar}`);
+        } catch (err) {
+          console.error('there was an error:', err.message);
+        }
 
         response(res, 200, newData, {}, 'Success updated user!');
       })
       .catch((err) => {
-        // try {
-        //   await fs.unlinkSync(`public/images/${avatar}`);
-        //   // console.log(`successfully deleted ${image}`);
-        // } catch (err) {
-        //   // console.error('there was an error:', error.message);
-        //   next();
-        // }
-
         next(err);
       });
   },
