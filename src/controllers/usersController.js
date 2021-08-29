@@ -114,7 +114,7 @@ module.exports = {
     });
   },
   createUser: (req, res, next) => {
-    const { email, password, name, role } = req.body;
+    const { email, password, name } = req.body;
     // Hashing Password
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
@@ -123,36 +123,31 @@ module.exports = {
     const newUID = short.generate();
 
     let today = new Date();
-    // const dd = String(today.getDate()).padStart(2, '0');
-    // const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    // const yyyy = today.getFullYear();
-
-    // today = mm + '/' + dd + '/' + yyyy;
 
     const dataUser = {
       idUser: newUID,
       email,
       password: hash,
       name,
-      role,
       updatedAt: today,
     };
-    // console.log('data user', dataUser);
+    console.log('data user', dataUser);
     // console.log(dataUser);
     UserModel.createUser(dataUser)
       .then(() => {
         // const email = 'cahyaulin@gmail.com';
         // JWT Token
         const token = jwt.sign({
-            id: dataUser.idUser,
+            idUser: dataUser.idUser,
             email: dataUser.email,
-            role: dataUser.role,
             name: dataUser.name,
-            actived: 0,
+            verification: 0,
           },
           privateKey, { expiresIn: '24h' }
         );
-        verifiedEmail(dataUser.email, dataUser.name, token);
+
+        // Email verification
+        // verifiedEmail(dataUser.email, dataUser.name, token);
 
         const dataResponse = dataUser;
         delete dataResponse.password;
@@ -169,58 +164,64 @@ module.exports = {
   updateUser: async(req, res, next) => {
     // Request
     const id = req.params.id;
+    const { name, phone, verification, avatar } = req.body;
 
-    const {
-      name,
-      email,
-      born,
-      phone,
-      role,
-      actived,
-      activedDate,
-      gender,
-      address,
-      avatar,
-    } = req.body;
+    // if (Object.keys(req.body).length === 0) {
+    //   console.log('req.body', req.body);
+    //   response(res, 501, {}, {}, 'Nothing data updated!');
+    // }
 
-    // Hashing Password
-    // const salt = bcrypt.genSaltSync(10);
-    // const hash = bcrypt.hashSync(password, salt);
+    let dataUpdate = {};
 
+    // START = UPDATE AVATAR
     const dataFilesRequest = req.file;
-
-    let avatarUpload;
+    const locationImage = `${process.env.HOST_SERVER}/files`;
 
     if (dataFilesRequest) {
-      avatarUpload = dataFilesRequest.filename || null;
+      dataUpdate.avatar =
+        `${locationImage}/${dataFilesRequest.filename}` || null;
+      dataUpdate.updatedAt = new Date();
     }
 
-    const newData = {
-      idUser: id,
-      name,
-      email,
-      born,
-      phone,
-      role,
-      actived,
-      activedDate,
-      gender,
-      address,
-      avatar,
-      avatar: avatarUpload ? avatarUpload : avatar,
-      updatedAt: new Date(),
-    };
-
+    if (avatar) {
+      dataUpdate.avatar = avatar;
+      dataUpdate.updatedAt = new Date();
+    }
     // OLD Images
-    const oldAvatar = await UserModel.getUserId(id)
+    let oldAvatar = await UserModel.getUserId(id)
       .then((result) => {
         const data = result[0].avatar;
-        return data;
+        const filename = data.split('/').pop();
+        return filename;
       })
       .catch(next);
-    console.log(oldAvatar);
+    console.log('oldAvatar', oldAvatar);
 
-    UserModel.updateUser(id, newData)
+    // END = UPDATE AVATAR
+
+    // START = UPDATE NAME
+    if (name) {
+      console.log('name', name);
+      dataUpdate.name = name;
+      dataUpdate.updatedAt = new Date();
+    }
+    // END = UPDATE NAME
+
+    // START = UPDATE PHONE
+    if (phone) {
+      dataUpdate.phone = phone;
+      dataUpdate.updatedAt = new Date();
+    }
+    // END = UPDATE PHONE
+
+    // START = UPDATE VERIFIED ACCOUNT
+    if (verification) {
+      dataUpdate.verification = verification;
+      dataUpdate.updatedAt = new Date();
+    }
+    // END = UPDATE VERIFIED ACCOUNT
+
+    UserModel.updateUser(id, dataUpdate)
       .then(async() => {
         // console.log(result);
         try {
@@ -230,7 +231,7 @@ module.exports = {
           console.error('there was an error:', err.message);
         }
 
-        response(res, 200, newData, {}, 'Success updated user!');
+        response(res, 200, dataUpdate, {}, 'Success updated user!');
       })
       .catch((err) => {
         next(err);

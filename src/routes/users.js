@@ -13,7 +13,6 @@ router
   .patch('/change-password/:id', verifyAccess, userController.updatePassword)
   .get('/:id', verifyAccess, userController.getUserId)
   .patch('/:id', verifyAccess, singleUpload, userController.updateUser)
-
-.delete('/:id', verifyAccess, userController.deleteUser);
+  .delete('/:id', verifyAccess, userController.deleteUser);
 
 module.exports = router;
