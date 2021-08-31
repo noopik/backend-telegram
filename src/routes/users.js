@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/usersController');
-const { verifyAccess } = require('../middleware/auth');
+const { verifyAccess, verifyAndRefreshAccess } = require('../middleware/auth');
 const { singleUpload } = require('../middleware/multer');
 
 router
   .get('/', verifyAccess, userController.getAllUsers)
-  .get('/verify-token', verifyAccess, userController.verifyTokenUser)
+  .get('/verify-token', verifyAndRefreshAccess, userController.verifyTokenUser)
   .post('/register', userController.createUser)
   .post('/login', userController.loginUser)
   .post('/forgot-password', userController.getUserByEmail)

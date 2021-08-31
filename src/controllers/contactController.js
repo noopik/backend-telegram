@@ -1,16 +1,16 @@
-const { v4: uuidv4 } = require('uuid');
 const { response, srcResponse, srcFeature, pagination } = require('../helpers');
+const short = require('short-uuid');
 
 const {
   getAllTransactionModel,
-  createTransaction,
+  createContact,
   updateTransaction,
   searchProductsModel,
-  getItemTransaction,
-} = require('../models/transaction');
+  getListContact,
+} = require('../models/Contact');
 
 module.exports = {
-  getAllTransaction: async(req, res, next) => {
+  getAllTransaction: async (req, res, next) => {
     // Pagination data from middleware before
     try {
       if (!req.query.src) {
@@ -63,7 +63,8 @@ module.exports = {
             srcResponse(
               res,
               error.statusCode,
-              meta, {},
+              meta,
+              {},
               error.message,
               error.message
             );
@@ -83,10 +84,10 @@ module.exports = {
     //   })
     //   .catch(next);
   },
-  getItemTransaction: (req, res) => {
-    const idTransaction = req.params.id;
-    // console.log(idTransaction);
-    getItemTransaction(idTransaction)
+  getListContactId: (req, res) => {
+    const idUser = req.params.id;
+    // console.log(idUser);
+    getListContact(idUser)
       .then((result) => {
         response(res, 200, result);
       })
@@ -94,24 +95,19 @@ module.exports = {
         response(res, 404, {}, err);
       });
   },
-  createItemTransaction: (req, res, next) => {
-    const { idUser, idNameProduct, quantity, idPayment, statusOrder } =
-    req.body;
+  createContact: (req, res, next) => {
+    const { idUser, idFriend } = req.body;
+    const uid = short.generate();
 
     const data = {
-      idTransaction: uuidv4(),
-      id_user: idUser,
-      id_name_product: idNameProduct,
-      quantity,
-      id_payment: idPayment,
-      statusOrder,
-      orderDate: new Date(),
-      updatedAt: new Date(),
+      idContact: `${idUser}_${idFriend}`,
+      idUser,
+      idFriend,
     };
 
-    createTransaction(data)
+    createContact(data)
       .then(() => {
-        response(res, 200, {}, {}, 'Success add transaction');
+        response(res, 200, {}, {}, 'Success add friend');
       })
       .catch(next);
   },

@@ -17,6 +17,7 @@ const verifyAccess = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, privateKey);
     req.user = decoded;
+    req.userId = decoded.idUser;
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
@@ -32,6 +33,41 @@ const verifyAccess = (req, res, next) => {
     const error = new Error('token not active');
     error.status = 401;
     return next(error);
+  }
+};
+const verifyAndRefreshAccess = (req, res, next) => {
+  // Request
+  const tokenHeader = req.headers.authorization;
+
+  if (!tokenHeader) {
+    const error = new Error('Server need token');
+    error.status = 401;
+    return next(error);
+  }
+
+  const token = tokenHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, privateKey);
+    req.tokenStatus = 'active';
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.log('err', err);
+    if (err.name === 'TokenExpiredError') {
+      const decoded = jwt.decode(token);
+      const error = 'token expired';
+      req.tokenStatus = error;
+      req.user = decoded;
+      next();
+    }
+    // if (err.name === 'JsonWebTokenError') {
+    //   const error = new Error('token invalid');
+    //   error.status = 401;
+    //   return next(error);
+    // }
+    // const error = new Error('token not active');
+    // error.status = 401;
+    // return next(error);
   }
 };
 
@@ -61,4 +97,9 @@ const sellerAccess = (req, res, next) => {
   next();
 };
 
-module.exports = { verifyAccess, superAccess, sellerAccess };
+module.exports = {
+  verifyAccess,
+  superAccess,
+  sellerAccess,
+  verifyAndRefreshAccess,
+};

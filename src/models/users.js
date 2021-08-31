@@ -1,6 +1,6 @@
 const { querySQL } = require('../helpers');
 module.exports = {
-  getAllUsers: async(field, sortBy, limit, offset) => {
+  getAllUsers: async (field, sortBy, limit, offset) => {
     const querySelectAll = 'SELECT * FROM users';
 
     const countDataInRows = await querySQL('SELECT COUNT(*) FROM users');
@@ -17,7 +17,7 @@ module.exports = {
 
     return { countRows, result: queryAll };
   },
-  searchUsers: async(value, limit, table, field, sortBy, offset) => {
+  searchUsers: async (value, limit, table, field, sortBy, offset) => {
     // console.log(value, limit, table, field, sortBy);
     // check result count searching
 
@@ -27,7 +27,7 @@ module.exports = {
     // `SELECT COUNT(*) from ${table} WHERE MATCH(nameProduct, description) AGAINST(${value} WITH QUERY EXPANSION)`
 
     const getCountRows = await querySQL(
-      `SELECT COUNT(*) FROM ${table} WHERE name LIKE '%${value}%' OR email LIKE '%${value}%'`
+      `SELECT COUNT(*) FROM users WHERE name LIKE '%${value}%' OR email LIKE '%${value}%' OR phone LIKE '%${value}%'`
     );
     // console.log(getCountRows);
     const dataCountRows = getCountRows[0];
@@ -36,7 +36,7 @@ module.exports = {
     // console.log(typeof offset);
 
     const limitResult = await querySQL(
-      `SELECT * FROM ${table} WHERE name LIKE '%${value}%' OR email LIKE '%${value}%' ORDER BY ${field} ${sortBy} LIMIT ${limit} OFFSET ${offset}`
+      `SELECT * FROM users WHERE name LIKE '%${value}%' OR email LIKE '%${value}%' OR phone LIKE '%${value}%' ORDER BY ${field} ${sortBy} LIMIT ${limit} OFFSET ${offset}`
     );
 
     // totalPage

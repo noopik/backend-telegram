@@ -3,14 +3,14 @@ const routes = express();
 const userRouter = require('./users');
 const productRouter = require('./products');
 const categoryRouter = require('./category');
-const paymentRouter = require('./payments');
-const transactionRouter = require('./transaction');
+const contactRouter = require('./contacts');
+const messageRouter = require('./messages');
 
 routes
   .use('/users', userRouter)
   .use('/products', productRouter)
   .use('/category', categoryRouter)
-  .use('/payments', paymentRouter)
-  .use('/transactions', transactionRouter);
+  .use('/contacts', contactRouter)
+  .use('/messages', messageRouter);
 
 module.exports = routes;

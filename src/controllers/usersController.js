@@ -16,8 +16,9 @@ const verifiedEmail = require('../helpers/verifiedEmail');
 const privateKey = process.env.PRIVATE_KEY;
 
 module.exports = {
-  getAllUsers: async(req, res, next) => {
+  getAllUsers: async (req, res, next) => {
     try {
+      // console.log('userId', req.userId);
       // PAGINATION
       if (!req.query.src) {
         const result = await pagination(req, res, next, UserModel.getAllUsers);
@@ -32,7 +33,13 @@ module.exports = {
           sortBy,
         } = result;
 
-        // console.log(1, totalPage);
+        // console.log('data', data);
+
+        const dataUpdate = data.filter((user) => {
+          if (user.idUser !== req.userId) {
+            return user;
+          }
+        });
 
         const meta = {
           currentPage,
@@ -47,25 +54,32 @@ module.exports = {
           // console.log(error);
           srcResponse(res, 404, meta, {}, error, error);
         } else {
-          srcResponse(res, 200, meta, data);
+          srcResponse(res, 200, meta, dataUpdate);
         }
       }
-      if (req.query.src || req.query.category) {
+      if (req.query.src) {
         srcFeature(req, res, next, UserModel.searchUsers).then(() => {
           // console.log(Object.keys(res.result));
 
           const { data, meta, error } = res.result;
 
+          const dataUpdate = data.filter((user) => {
+            if (user.idUser !== req.userId) {
+              return user;
+            }
+          });
+
           if (error.statusCode && error.message) {
             srcResponse(
               res,
               error.statusCode,
-              meta, {},
+              meta,
+              {},
               error.message,
               error.message
             );
           } else {
-            srcResponse(res, 200, meta, data, {});
+            srcResponse(res, 200, meta, dataUpdate, {});
           }
         });
       }
@@ -91,14 +105,16 @@ module.exports = {
           response(res, 404, {}, message, 'Failed');
         }
         const data = result[0];
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             id: data.idUser,
             email: data.email,
             role: data.role,
             name: data.name,
             verified: data.verified,
           },
-          privateKey, { expiresIn: '8h' }
+          privateKey,
+          { expiresIn: '8h' }
         );
         requestNewPasswordVerification(email, data.name, token);
         response(res, 200, 'Email verification have been send');
@@ -107,9 +123,39 @@ module.exports = {
   },
   verifyTokenUser: (req, res) => {
     const decodeResult = req.user;
+    const tokenStatus = req.tokenStatus;
+
+    let newToken;
+    let newRefreshToken;
+
+    if (tokenStatus === 'token expired') {
+      newToken = jwt.sign(
+        {
+          email: decodeResult.email,
+          name: decodeResult.name,
+        },
+        privateKey,
+        { expiresIn: '24h' }
+      );
+      newRefreshToken = jwt.sign(
+        {
+          email: decodeResult.email,
+          name: decodeResult.name,
+        },
+        privateKey,
+        { expiresIn: `${24 * 7}h` }
+      );
+    }
+
     UserModel.getUserEmail(decodeResult.email).then((result) => {
       const dataResult = result[0];
       delete dataResult.password;
+      if (newToken) {
+        dataResult.token = newToken;
+      }
+      if (newRefreshToken) {
+        dataResult.refresh = newRefreshToken;
+      }
       response(res, 200, dataResult);
     });
   },
@@ -137,13 +183,15 @@ module.exports = {
       .then(() => {
         // const email = 'cahyaulin@gmail.com';
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
             idUser: dataUser.idUser,
             email: dataUser.email,
             name: dataUser.name,
             verification: 0,
           },
-          privateKey, { expiresIn: '24h' }
+          privateKey,
+          { expiresIn: '24h' }
         );
 
         // Email verification
@@ -161,11 +209,10 @@ module.exports = {
         console.log(err);
       });
   },
-  updateUser: async(req, res, next) => {
+  updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
-    const { name, phone, verification, avatar } = req.body;
-
+    const { name, phone, verification, avatar, biography } = req.body;
     // if (Object.keys(req.body).length === 0) {
     //   console.log('req.body', req.body);
     //   response(res, 501, {}, {}, 'Nothing data updated!');
@@ -191,7 +238,10 @@ module.exports = {
     let oldAvatar = await UserModel.getUserId(id)
       .then((result) => {
         const data = result[0].avatar;
-        const filename = data.split('/').pop();
+        let filename;
+        if (data) {
+          filename = data.split('/').pop();
+        }
         return filename;
       })
       .catch(next);
@@ -213,6 +263,13 @@ module.exports = {
       dataUpdate.updatedAt = new Date();
     }
     // END = UPDATE PHONE
+    // START = UPDATE PHONE
+
+    if (biography) {
+      dataUpdate.biography = biography;
+      dataUpdate.updatedAt = new Date();
+    }
+    // END = UPDATE PHONE
 
     // START = UPDATE VERIFIED ACCOUNT
     if (verification) {
@@ -222,7 +279,7 @@ module.exports = {
     // END = UPDATE VERIFIED ACCOUNT
 
     UserModel.updateUser(id, dataUpdate)
-      .then(async() => {
+      .then(async () => {
         // console.log(result);
         try {
           await fs.unlinkSync(`public/images/${oldAvatar}`);
@@ -237,6 +294,18 @@ module.exports = {
         next(err);
       });
   },
+  updateStatus: (idUser, status) => {
+    // START = UPDATE STATUS
+    console.log(status);
+    let dataUpdate = {
+      status: status,
+      updatedAt: new Date(),
+    };
+    // END = UPDATE STATUS
+    UserModel.updateUser(idUser, dataUpdate).then(() => {
+      console.log('Success update status');
+    });
+  },
   updatePassword: (req, res, next) => {
     const id = req.params.id;
     const { currentPassword, newPassword } = req.body;
@@ -245,10 +314,10 @@ module.exports = {
     UserModel.getUserId(id)
       .then((result) => {
         const hashPassowrdDB = result[0].password;
-        bcrypt.compare(currentPassword, hashPassowrdDB, function(err, result) {
+        bcrypt.compare(currentPassword, hashPassowrdDB, function (err, result) {
           if (result == true) {
             const saltRounds = 10;
-            bcrypt.hash(newPassword, saltRounds, function(err, hash) {
+            bcrypt.hash(newPassword, saltRounds, function (err, hash) {
               const newPasswordInsert = {
                 password: hash,
               };
@@ -309,20 +378,25 @@ module.exports = {
           response(res, 404, {}, message, 'Cannot login');
         }
         // JWT Token
-        const token = jwt.sign({
+        const token = jwt.sign(
+          {
+            idUser: dataUserRes.idUser,
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: '12h' }
+          privateKey,
+          { expiresIn: '24h' }
         );
 
-        const refreshToken = jwt.sign({
+        const refreshToken = jwt.sign(
+          {
             email: dataUserRes.email,
             role: dataUserRes.role,
             name: dataUserRes.name,
           },
-          privateKey, { expiresIn: `${24 * 7}h` }
+          privateKey,
+          { expiresIn: `${24 * 7}h` }
         );
 
         delete dataUserRes.password;
