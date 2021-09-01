@@ -223,29 +223,40 @@ module.exports = {
     // START = UPDATE AVATAR
     const dataFilesRequest = req.file;
     const locationImage = `${process.env.HOST_SERVER}/files`;
-
-    if (dataFilesRequest) {
+    let oldAvatar;
+    if (dataFilesRequest && !avatar) {
       dataUpdate.avatar =
         `${locationImage}/${dataFilesRequest.filename}` || null;
       dataUpdate.updatedAt = new Date();
+      oldAvatar = await UserModel.getUserId(id)
+        .then((result) => {
+          const data = result[0].avatar;
+          let filename;
+          if (data) {
+            filename = data.split('/').pop();
+          }
+          return filename;
+        })
+        .catch(next);
     }
 
-    if (avatar) {
+    if (avatar && !dataFilesRequest) {
       dataUpdate.avatar = avatar;
       dataUpdate.updatedAt = new Date();
+      oldAvatar = await UserModel.getUserId(id)
+        .then((result) => {
+          const data = result[0].avatar;
+          let filename;
+          if (data) {
+            filename = data.split('/').pop();
+          }
+          return filename;
+        })
+        .catch(next);
     }
     // OLD Images
-    let oldAvatar = await UserModel.getUserId(id)
-      .then((result) => {
-        const data = result[0].avatar;
-        let filename;
-        if (data) {
-          filename = data.split('/').pop();
-        }
-        return filename;
-      })
-      .catch(next);
     console.log('oldAvatar', oldAvatar);
+    console.log('dataUpdate.avatar', dataUpdate.avatar);
 
     // END = UPDATE AVATAR
 
@@ -345,7 +356,11 @@ module.exports = {
   deleteUser: (req, res, next) => {
     const id = req.params.id;
     UserModel.deleteUser(id)
-      .then(() => {
+      .then((result) => {
+        if (result.affectedRows !== 1) {
+          response(res, 404, {}, {}, 'User not found');
+        }
+        // console.log(res);
         response(res, 200);
       })
       .catch(next);
