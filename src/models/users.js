@@ -85,6 +85,7 @@ module.exports = {
     return querySQL('DELETE FROM users WHERE idUser = ?', idUser);
   },
   getUserEmail: (email) => {
-    return querySQL('SELECT * FROM users WHERE email LIKE ?', email);
+    console.log('email sql', email);
+    return querySQL(`SELECT * FROM users WHERE email = '${email}'`);
   },
 };

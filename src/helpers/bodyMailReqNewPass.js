@@ -239,7 +239,7 @@ const bodyMailReqNewPass = (token, nameTo, emailTo) => {
                                                                       arial,
                                                                       sans-serif;
                                                                     font-size: 16px;
-                                                                  " width="135" height="66" alt="" data-proportionally-constrained="true" data-responsive="false" src="https://res.cloudinary.com/dnv-images/image/upload/v1627485833/Blanja%20com/Group_1312_vxuzdz.png"
+                                                                  " width="135" height="66" alt="" data-proportionally-constrained="true" data-responsive="false" src="https://res.cloudinary.com/dnv-images/image/upload/v1630502289/Talegram%20Web%20App/Telegram_nojch9.png"
                                                                 height="33" />
                                                             </td>
                                                           </tr>
@@ -612,7 +612,7 @@ const bodyMailReqNewPass = (token, nameTo, emailTo) => {
                                                 line-height: 20px;
                                               "
                                             >
-                                              CEO Blanja.com
+                                              CEO Telegram Clone
                                             </p>
                                             <p
                                               style="

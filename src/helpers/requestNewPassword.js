@@ -15,7 +15,7 @@ const requestNewPassword = (emailTo, nameTo, token) => {
   transporter
     .sendMail({
       // eslint-disable-next-line no-undef
-      from: `Cyber Security of Blanja.com | ${process.env.EMAIL_SERVICE}`, // sender address
+      from: `Telegram Security Team | ${process.env.EMAIL_SERVICE}`, // sender address
       to: emailTo, // list of receivers
       subject: 'Request New Password', // Subject line
       html: bodyMailReqNewPass(token, nameTo, emailTo), // html body

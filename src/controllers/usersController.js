@@ -98,18 +98,20 @@ module.exports = {
   },
   getUserByEmail: (req, res, next) => {
     const { email } = req.body;
+    // console.log('email', email);
     UserModel.getUserEmail(email)
       .then((result) => {
+        // console.log('result', result);
         if (result.length === 0) {
           const message = 'Account not found!';
           response(res, 404, {}, message, 'Failed');
         }
+
         const data = result[0];
         const token = jwt.sign(
           {
-            id: data.idUser,
+            idUser: data.idUser,
             email: data.email,
-            role: data.role,
             name: data.name,
             verified: data.verified,
           },
@@ -177,7 +179,7 @@ module.exports = {
       name,
       updatedAt: today,
     };
-    console.log('data user', dataUser);
+    // console.log('data user', dataUser);
     // console.log(dataUser);
     UserModel.createUser(dataUser)
       .then(() => {
