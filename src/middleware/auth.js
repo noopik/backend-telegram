@@ -6,6 +6,7 @@ const privateKey = process.env.PRIVATE_KEY;
 const verifyAccess = (req, res, next) => {
   // Request
   const tokenHeader = req.headers.authorization;
+  // console.log('get tokenHeader', tokenHeader);
 
   if (!tokenHeader) {
     const error = new Error('Server need token');

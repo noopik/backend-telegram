@@ -238,7 +238,7 @@ const bodyMail = (token, nameTo) => {
                                                                         arial,
                                                                         sans-serif;
                                                                       font-size: 16px;
-                                                                    " width="135" height="66" alt="" data-proportionally-constrained="true" data-responsive="false" src="https://res.cloudinary.com/dnv-images/image/upload/v1627485833/Blanja%20com/Group_1312_vxuzdz.png"
+                                                                    " width="135" height="66" alt="" data-proportionally-constrained="true" data-responsive="false" src="https://res.cloudinary.com/dnv-images/image/upload/v1630502289/Talegram%20Web%20App/Telegram_nojch9.png"
                                                                   height="33" />
                                                               </td>
                                                             </tr>
@@ -340,7 +340,7 @@ const bodyMail = (token, nameTo) => {
                                                                         of
                                                                         features
                                                                         in
-                                                                        Blanja.com.</span
+                                                                        Telegram Clone</span
                                                                       ><span
                                                                         style="
                                                                           color: #000000;
@@ -365,7 +365,7 @@ const bodyMail = (token, nameTo) => {
                                                                     >
                                                                       <span
                                                                         style="
-                                                                          color: #db3022;
+                                                                          color: #7E98DF;
                                                                           font-size: 18px;
                                                                         "
                                                                         ><strong
@@ -446,7 +446,7 @@ const bodyMail = (token, nameTo) => {
                                                                       <tr>
                                                                         <td
                                                                           align="center"
-                                                                          bgcolor="#DB3022"
+                                                                          bgcolor="#7E98DF"
                                                                           class="
                                                                             inner-td
                                                                           "
@@ -460,11 +460,11 @@ const bodyMail = (token, nameTo) => {
                                                                           <a 
                                                                             href='${process.env.HOST_CLIENT}/users-verified/${token}'
                                                                             style="
-                                                                              background-color: #db3022;
+                                                                              background-color: #7E98DF;
                                                                               border: 1px
                                                                                 solid
-                                                                                #db3022;
-                                                                              border-color: #db3022;
+                                                                                #7E98DF;
+                                                                              border-color: #7E98DF;
                                                                               border-radius: 0px;
                                                                               border-width: 1px;
                                                                               color: #ffffff;
@@ -606,7 +606,7 @@ const bodyMail = (token, nameTo) => {
                                                   line-height: 20px;
                                                 "
                                               >
-                                                CEO Blanja.com
+                                                Developer Telegram Clone | Noopik
                                               </p>
                                               <p
                                                 style="

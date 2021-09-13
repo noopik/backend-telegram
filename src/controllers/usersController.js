@@ -89,6 +89,7 @@ module.exports = {
   },
   getUserId: (req, res, next) => {
     const id = req.params.id;
+    console.log('ID USER', id);
     UserModel.getUserId(id)
       .then((result) => {
         const data = result;
@@ -197,7 +198,7 @@ module.exports = {
         );
 
         // Email verification
-        // verifiedEmail(dataUser.email, dataUser.name, token);
+        verifiedEmail(dataUser.email, dataUser.name, token);
 
         const dataResponse = dataUser;
         delete dataResponse.password;
@@ -214,7 +215,8 @@ module.exports = {
   updateUser: async (req, res, next) => {
     // Request
     const id = req.params.id;
-    const { name, phone, verification, avatar, biography } = req.body;
+    const { name, phone, verification, avatar, biography, status } = req.body;
+    console.log('req.body', req.body);
     // if (Object.keys(req.body).length === 0) {
     //   console.log('req.body', req.body);
     //   response(res, 501, {}, {}, 'Nothing data updated!');
@@ -256,9 +258,6 @@ module.exports = {
         })
         .catch(next);
     }
-    // OLD Images
-    console.log('oldAvatar', oldAvatar);
-    console.log('dataUpdate.avatar', dataUpdate.avatar);
 
     // END = UPDATE AVATAR
 
@@ -276,13 +275,26 @@ module.exports = {
       dataUpdate.updatedAt = new Date();
     }
     // END = UPDATE PHONE
-    // START = UPDATE PHONE
+
+    // START = UPDATE BIOGRAPHY
 
     if (biography) {
       dataUpdate.biography = biography;
       dataUpdate.updatedAt = new Date();
     }
-    // END = UPDATE PHONE
+    // END = UPDATE BIOGRAPHY
+
+    // START = UPDATE STATUS ONLINE OR OFFLINE
+
+    if (status) {
+      if (status === 'offline') {
+        dataUpdate.status = null;
+      } else {
+        dataUpdate.status = status;
+      }
+      dataUpdate.updatedAt = new Date();
+    }
+    // END = UPDATE STATUS ONLINE OR OFFLINE
 
     // START = UPDATE VERIFIED ACCOUNT
     if (verification) {
@@ -290,15 +302,17 @@ module.exports = {
       dataUpdate.updatedAt = new Date();
     }
     // END = UPDATE VERIFIED ACCOUNT
-
+    // console.log('dataUpdate', dataUpdate);
     UserModel.updateUser(id, dataUpdate)
       .then(async () => {
         // console.log(result);
-        try {
-          await fs.unlinkSync(`public/images/${oldAvatar}`);
-          console.log(`successfully deleted ${oldAvatar}`);
-        } catch (err) {
-          console.error('there was an error:', err.message);
+        if (avatar || dataFilesRequest) {
+          try {
+            await fs.unlinkSync(`public/images/${oldAvatar}`);
+            console.log(`successfully deleted ${oldAvatar}`);
+          } catch (err) {
+            console.error('there was an error:', err.message);
+          }
         }
 
         response(res, 200, dataUpdate, {}, 'Success updated user!');

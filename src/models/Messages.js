@@ -9,4 +9,9 @@ module.exports = {
       `SELECT * FROM messages where (idReceiver = '${idReceiver}' AND idSender = '${idSender}') OR (idReceiver = '${idSender}' AND idSender = '${idReceiver}') ORDER BY createdAt ASC`
     );
   },
+  getLastMessageById: (idSender, idReceiver) => {
+    return querySQL(
+      `SELECT * FROM messages where (idReceiver = '${idReceiver}' AND idSender = '${idSender}') OR (idReceiver = '${idSender}' AND idSender = '${idReceiver}') ORDER BY createdAt ASC`
+    );
+  },
 };

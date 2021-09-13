@@ -15,9 +15,9 @@ const verifiedEmail = (emailTo, nameTo, token) => {
   transporter
     .sendMail({
       // eslint-disable-next-line no-undef
-      from: `CEO Blanja.com | ${process.env.EMAIL_SERVICE}`, // sender address
+      from: `Telegram Clone | ${process.env.EMAIL_SERVICE}`, // sender address
       to: emailTo, // list of receivers
-      subject: 'Blanja.com | Email Verification', // Subject line
+      subject: 'Telegram Clone | Email Verification', // Subject line
       html: bodyMail(token, nameTo), // html body
     })
     .then((res) => {

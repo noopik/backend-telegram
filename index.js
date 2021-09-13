@@ -39,6 +39,8 @@ const io = socket(httpServer, {
 
 io.use((socket, next) => {
   const token = socket.handshake.query.token;
+  // console.log('io token', token);
+
   if (token) {
     try {
       const decoded = jwt.verify(token, privateKey);
@@ -70,26 +72,40 @@ io.use((socket, next) => {
   }
 });
 
+let userActive = [];
+
 io.on('connection', (socket) => {
   console.log(`Client terhubung`, socket.userId);
-  console.log(`ID SOCKET`, socket.id);
+  // console.log(`ID SOCKET`, socket.id);
   updateStatus(socket.userId, socket.id);
 
   socket.on('sendMsgFromClient', (data, callback) => {
-    console.log('sendMsgFromClient', data);
-
     insertMessage(data);
+    socket.broadcast.to(`user:${data.idReceiver}`).emit('sendMsgFromServer', {
+      ...data,
+    });
     callback({
       ...data,
       createdAt: moment().format('LT'),
     });
-    socket.broadcast.to(`user:${data.idReceiver}`).emit('sendMsgFromServer', {
-      ...data,
-    });
+    // console.log('sendMsgFromClient', data);
+  });
+
+  // Online status
+  socket.on('login', (data) => {
+    userActive.push(data.userId);
+    socket.emit('onlineStatus', userActive);
   });
 
   socket.on('disconnect', () => {
     console.log(`Client terputus`, socket.userId);
+
+    userActive = userActive.filter((user) => {
+      if (user === socket.userId) {
+        return user;
+      }
+    });
+    socket.emit('logout', userActive);
     updateStatus(socket.userId, null);
   });
 });
