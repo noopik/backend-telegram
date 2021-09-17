@@ -16,6 +16,7 @@ const {
   updateUser,
   updateStatus,
 } = require('./src/controllers/usersController');
+
 moment.locale('id');
 
 // eslint-disable-next-line no-undef
@@ -38,8 +39,8 @@ const io = socket(httpServer, {
 });
 
 io.use((socket, next) => {
+  // console.log('socket', socket);
   const token = socket.handshake.query.token;
-  // console.log('io token', token);
 
   if (token) {
     try {

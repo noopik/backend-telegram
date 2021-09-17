@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const verifiedEmail = require('../helpers/verifiedEmail');
+const cloudinary = require('../middleware/cloudinary');
 
 // eslint-disable-next-line no-undef
 const privateKey = process.env.PRIVATE_KEY;
@@ -216,6 +217,7 @@ module.exports = {
     // Request
     const id = req.params.id;
     const { name, phone, verification, avatar, biography, status } = req.body;
+
     console.log('req.body', req.body);
     // if (Object.keys(req.body).length === 0) {
     //   console.log('req.body', req.body);
@@ -225,38 +227,45 @@ module.exports = {
     let dataUpdate = {};
 
     // START = UPDATE AVATAR
+    // UPDATE AVATAR
+    const uploader = async (path) =>
+      await cloudinary.uploads(path, 'Telegram Clone');
     const dataFilesRequest = req.file;
-    const locationImage = `${process.env.HOST_SERVER}/files`;
+    // const locationImage = `${process.env.HOST_SERVER}/files`;
+    // console.log('dataFilesRequest', dataFilesRequest);
     let oldAvatar;
     if (dataFilesRequest && !avatar) {
-      dataUpdate.avatar =
-        `${locationImage}/${dataFilesRequest.filename}` || null;
+      // dataUpdate.avatar =
+      //   `${locationImage}/${dataFilesRequest.filename}` || null;
+      const uploadImage = await uploader(dataFilesRequest.path);
+
+      dataUpdate.avatar = uploadImage.url ? uploadImage.url : null;
       dataUpdate.updatedAt = new Date();
-      oldAvatar = await UserModel.getUserId(id)
-        .then((result) => {
-          const data = result[0].avatar;
-          let filename;
-          if (data) {
-            filename = data.split('/').pop();
-          }
-          return filename;
-        })
-        .catch(next);
+      // oldAvatar = await UserModel.getUserId(id)
+      //   .then((result) => {
+      //     const data = result[0].avatar;
+      //     let filename;
+      //     if (data) {
+      //       filename = data.split('/').pop();
+      //     }
+      //     return filename;
+      //   })
+      //   .catch(next);
     }
 
     if (avatar && !dataFilesRequest) {
       dataUpdate.avatar = avatar;
       dataUpdate.updatedAt = new Date();
-      oldAvatar = await UserModel.getUserId(id)
-        .then((result) => {
-          const data = result[0].avatar;
-          let filename;
-          if (data) {
-            filename = data.split('/').pop();
-          }
-          return filename;
-        })
-        .catch(next);
+      // oldAvatar = await UserModel.getUserId(id)
+      //   .then((result) => {
+      //     const data = result[0].avatar;
+      //     let filename;
+      //     if (data) {
+      //       filename = data.split('/').pop();
+      //     }
+      //     return filename;
+      //   })
+      //   .catch(next);
     }
 
     // END = UPDATE AVATAR
