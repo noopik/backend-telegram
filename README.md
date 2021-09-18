@@ -54,7 +54,7 @@
 
 ## About The Project
 
-<b>Telegram Clone</b> is a web site-based two-way <br /> real-time chat communication application.
+<b>Telegram Clone</b> is a web site-based two-way real-time chat communication application.
 
 ### Build With
 * [Express Js](https://expressjs.com/)
