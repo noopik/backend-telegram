@@ -87,7 +87,7 @@ cd backend-telegram
 ```sh
 npm install
 ```
-4. Make a new database and import [telegram-db-structure-sample.sql](https://drive.google.com/file/d/nooooooooooooo)
+4. Make a new database and import [telegram-db-structure-sample.sql](https://drive.google.com/file/d/1ZXEZyO_tt6THOxDSvtYvnfmDvC--7gyX/view?usp=sharing)
 5. Add .env file at root folder project, and add following
 ```sh
 DB_NAME = [DB_NAME]
@@ -109,7 +109,7 @@ API_SECRET=[YOUR_API_SECRET_CLODINARY]
 npm run dev
 ```
 7. Testing with Postman
-    * [Blanja Postman APIs Collection](https://documenter.getpostman.com/.................)
+    * [Telegram Clone Postman APIs Collection](https://documenter.getpostman.com/view/15390348/UUxtDVRf)
 
 ### Related Project
 
@@ -119,7 +119,7 @@ npm run dev
 
 ## Blanja API Documentation
 
-* [Telegram Clone Postman APIs Collection](https://documenter.getpostman.com/view/15390348/sssssssssssssssss)
+* [Telegram Clone Postman APIs Collection](https://documenter.getpostman.com/view/15390348/UUxtDVRf)
 
 ## Contact
 My Email : novidwicahya19@gmail.com
