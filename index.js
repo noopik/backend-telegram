@@ -28,13 +28,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // CORS
-app.use(cors());
+const optionCors = {
+  credentials: true,
+  origin: process.env.HOST_CLIENT,
+};
+
+app.use(cors(optionCors));
 app.use(morgan('dev'));
 
 // Realtime
+
 const io = socket(httpServer, {
   cors: {
-    origin: '*',
+    origin: optionCors,
   },
 });
 
