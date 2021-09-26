@@ -11,7 +11,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const verifiedEmail = require('../helpers/verifiedEmail');
-const cloudinary = require('../middleware/cloudinary');
+const cloudinary = require('cloudinary').v2;
+const { configCloudinary } = require('../middleware/cloudinary');
+cloudinary.config(configCloudinary);
 
 // eslint-disable-next-line no-undef
 const privateKey = process.env.PRIVATE_KEY;
@@ -214,65 +216,32 @@ module.exports = {
       });
   },
   updateUser: async (req, res, next) => {
-    // Request
     const id = req.params.id;
     const { name, phone, verification, avatar, biography, status } = req.body;
-
-    console.log('req.body', req.body);
-    // if (Object.keys(req.body).length === 0) {
-    //   console.log('req.body', req.body);
-    //   response(res, 501, {}, {}, 'Nothing data updated!');
-    // }
 
     let dataUpdate = {};
 
     // START = UPDATE AVATAR
     // UPDATE AVATAR
-    const uploader = async (path) =>
-      await cloudinary.uploads(path, 'Telegram Clone');
-    const dataFilesRequest = req.file;
-    // const locationImage = `${process.env.HOST_SERVER}/files`;
-    // console.log('dataFilesRequest', dataFilesRequest);
-    let oldAvatar;
-    if (dataFilesRequest && !avatar) {
-      // dataUpdate.avatar =
-      //   `${locationImage}/${dataFilesRequest.filename}` || null;
-      const uploadImage = await uploader(dataFilesRequest.path);
+    const fileUpload = req.file;
 
-      dataUpdate.avatar = uploadImage.url ? uploadImage.url : null;
+    console.log('req.body', req.body);
+    console.log('dataUpdate', dataUpdate);
+
+    let oldAvatar;
+    if (fileUpload) {
+      dataUpdate.avatar = fileUpload.path;
       dataUpdate.updatedAt = new Date();
-      // oldAvatar = await UserModel.getUserId(id)
-      //   .then((result) => {
-      //     const data = result[0].avatar;
-      //     let filename;
-      //     if (data) {
-      //       filename = data.split('/').pop();
-      //     }
-      //     return filename;
-      //   })
-      //   .catch(next);
     }
 
-    if (avatar && !dataFilesRequest) {
+    if (avatar) {
       dataUpdate.avatar = avatar;
       dataUpdate.updatedAt = new Date();
-      // oldAvatar = await UserModel.getUserId(id)
-      //   .then((result) => {
-      //     const data = result[0].avatar;
-      //     let filename;
-      //     if (data) {
-      //       filename = data.split('/').pop();
-      //     }
-      //     return filename;
-      //   })
-      //   .catch(next);
     }
-
     // END = UPDATE AVATAR
 
     // START = UPDATE NAME
     if (name) {
-      console.log('name', name);
       dataUpdate.name = name;
       dataUpdate.updatedAt = new Date();
     }
@@ -315,14 +284,14 @@ module.exports = {
     UserModel.updateUser(id, dataUpdate)
       .then(async () => {
         // console.log(result);
-        if (avatar || dataFilesRequest) {
-          try {
-            await fs.unlinkSync(`public/images/${oldAvatar}`);
-            console.log(`successfully deleted ${oldAvatar}`);
-          } catch (err) {
-            console.error('there was an error:', err.message);
-          }
-        }
+        // if (avatar || fileUpload) {
+        //   try {
+        //     await fs.unlinkSync(`public/images/${oldAvatar}`);
+        //     console.log(`successfully deleted ${oldAvatar}`);
+        //   } catch (err) {
+        //     console.error('there was an error:', err.message);
+        //   }
+        // }
 
         response(res, 200, dataUpdate, {}, 'Success updated user!');
       })
