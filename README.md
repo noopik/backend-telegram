@@ -5,7 +5,7 @@
     <img src="https://res.cloudinary.com/dnv-images/image/upload/v1631893565/Telegram%20Clone/Frame_1_jnfh3u.svg" alt="Logo" width="500" height="180">
   </a>
 
-  <h3 align="center">RESTful API for Telegram Clone </h3>
+  <h3 align="center">Backend Application for Telegram Clone</h3>
 
   <p align="center">
     Telegram clone is a web site-based two-way <br /> real-time chat communication application. 
@@ -54,7 +54,7 @@
 
 ## About The Project
 
-<b>Telegram Clone</b> is a web site-based two-way real-time chat communication application.
+<b>Telegram Clone</b> is a web site-based two-way real-time chat communication application. Has features including two-way private messaging between users, searching user lists, viewing profiles between users, and updating user data.
 
 ### Build With
 * [Express Js](https://expressjs.com/)
